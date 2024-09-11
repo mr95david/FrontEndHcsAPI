@@ -2,20 +2,20 @@
 import React, { useEffect, useState } from "react";
 import ROSLIB from "roslib";
 
-const CameraData = ({ ros }) => {
+const CameraData = ({ ros, topic }) => {
     // declaracion de variables de obtencion de datos de camara
     const [imgData, setImgData] = useState('');
 
     useEffect(() => {
         // Validacion de actual conexion de ros2
-        if (!ros){
+        if (!ros || !topic){
             return;
         }
 
         // Variable de almacenamiento de datos de imagenes
         const listener = new ROSLIB.Topic({
             ros: ros, // Instancia de ros usada (scope global)
-            name: '/color/image_raw/compressed', // Nombre del topico
+            name: topic, // Nombre del topico
             messageType: 'sensor_msgs/CompressedImage' // Tipo de imagen que se va a recibir
         });
 
@@ -30,13 +30,13 @@ const CameraData = ({ ros }) => {
         return () => {
             listener.unsubscribe();
         };
-    }, [ros]);
+    }, [ros, topic]);
 
     return (
-        <div>
-            <h3>Received Image:</h3>
+        <div className="bg-indigo-300 rounded-t-lg">
+            {/* <h3>Received Image:</h3> */}
             {imgData ? (
-                <img src={imgData} alt="Received ROS Image" style={{ maxWidth: '100%' }} />
+                <img className="object-cover h-420 w-640 rounded-t-lg" src={imgData} alt="Received ROS Image" style={{ maxWidth: '100%' }} />
             ) : (
                 <p>Waiting for images...</p>
             )}

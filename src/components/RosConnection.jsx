@@ -43,8 +43,8 @@ const Rosconnect = ({ setRos }) => {
 
     // Retorno final de funcion
     return (
-        <div>
-            <h2>ROS2 Connection Status</h2>
+        <div className="status-connection">
+            <span>Status Connection:</span>
             <div>
                 {connected ? (
                     <span style={{ color: 'green' }}>Connected</span>
