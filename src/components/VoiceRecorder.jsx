@@ -1,16 +1,13 @@
 // Importe de librerias
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from 'axios';
 
 // Clase de ejecucion de grabacion  
 const VoiceRecorder = ({setTranscription}) => {
-    // Seccion de designacion de variables 
-    // Variable de validacion de  estado de grabacion
     const [isRecording, setIsRecording] = useState(false);
-    // Variable de almacenamiento de audio
-    const [audioUrl, setAudioUrl] = useState(null);
+    const [isFileProcessing, setIsFileProcessing] = useState(false);
     const [audioFile, setAudioFile] = useState(null);
-    // Verificacion de referencia
+    const [audioUrl, setAudioUrl] = useState(null);
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
 
@@ -45,8 +42,9 @@ const VoiceRecorder = ({setTranscription}) => {
 
     // Funcion para detener la deteccion de audio
     const stopRecording = () => {
-        setIsRecording(false);
         mediaRecorderRef.current.stop();
+        setIsRecording(false);
+        setIsFileProcessing(true);
     };
 
     // Funcion para almacenar el nuevo audio tomado
@@ -64,30 +62,37 @@ const VoiceRecorder = ({setTranscription}) => {
             });
 
             // Actualizacion de datos de textarea
+            
             setTranscription(response.data.transcription);
             console.log('File uploaded successfully:', response.data);
         } catch (error) {
             console.error('Error uploading file:', error);
+        }finally{
+            setIsFileProcessing(false);
         }
     };
 
     return (
-        <div className="voice-section-button">
-            <button className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:focus:ring-blue-800"
-             onClick={isRecording ? stopRecording : startRecording}>
-                {isRecording ? "Stop Recording" : "Start Recording"}
+        <div>
+            <button
+            className={`p-2 text-gray-500 hover:text-green-600 focus:outline-none ${isRecording ? 'text-red-600' : 'text-gray-600'}`}
+            onClick={isRecording ? stopRecording : startRecording}
+            >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 14a3 3 0 003-3V5a3 3 0 10-6 0v6a3 3 0 003 3z" />
+                <path d="M19 11a1 1 0 10-2 0 5 5 0 01-10 0 1 1 0 10-2 0 7 7 0 006 6.92V20h-3a1 1 0 000 2h8a1 1 0 000-2h-3v-2.08A7 7 0 0019 11z" />
+            </svg>
             </button>
-            <button className="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800"
-                onClick={uploadRecording} disabled={!audioFile}>
-                Send Audio
+            <button
+                className={`p-2 text-gray-500 focus:outline-none ${isFileProcessing ? 'text-green-600' : 'text-gray-600'}`}
+                onClick={uploadRecording} disabled={!audioFile}
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M21 11.5a8.38 8.38 0 01-1.25 4.38 8.5 8.5 0 01-7.25 3.62 8.38 8.38 0 01-4.38-1.25L3 21l2.75-5.12A8.38 8.38 0 014.5 11.5 8.5 8.5 0 0112 3a8.5 8.5 0 018.5 8.5z" />
+                </svg>
             </button>
-            {audioUrl && (
-                <div className="flex justify-center content-center items-start">
-                    <audio src={audioUrl} controls />
-                </div>
-            )}
         </div>
-    );
+        );
 };
 
 export default VoiceRecorder;
